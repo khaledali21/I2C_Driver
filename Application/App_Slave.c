@@ -36,7 +36,7 @@ void App_Slave(void)
 				}
 			}
 			else{
-				UART_u8GetData(&data);
+				UART_u8ReceiveData(&data);
 				state = I2C_u8SlaveSendData(data);
 				if(state != 1){
 					LED_u8ON(&led1);

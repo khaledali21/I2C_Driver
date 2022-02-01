@@ -8,12 +8,20 @@
 #include "I2C.h"
 
 
-
+/*
+* brief: This function is used to Initialize the I2C driver
+*/
 void I2C_Init(void){
 	CLR_BIT(TWSR_REG, TWPS0);
 	CLR_BIT(TWSR_REG, TWPS1);
 	TWBR_REG = ((I2C_F_CPU/SCL_CLK) - 16UL) / 2;
 }
+/*
+* brief: This function is used to start transmission by the master and send targeted slave address
+* param.: (input) the address of the required slave
+* param.: (input) the required action to be done in this transmission either WRITE or READ
+* return: (output) the Error state of the function 0 if an error happens and 1 otherwise
+*/
 I2C_ERR_STATE I2C_u8Start(uint8_t address, ACTION action){
 	uint8_t u8State = I2C_OK;
 	TWCR_REG = (1 << TWINT) | (1 << TWSTA) | (1 <<	TWEN); // Send Start Condition
@@ -43,10 +51,17 @@ I2C_ERR_STATE I2C_u8Start(uint8_t address, ACTION action){
 	}
 	return u8State;
 }
-
+/*
+* brief: This function is used to end the current transmission
+*/
 void I2C_Stop(void){
 	TWCR_REG = (1 << TWINT) | (1 << TWSTO) | (1 <<	TWEN); // Send Start Condition
 }
+/*
+* brief: This function is used to send data from the master to the SDA line
+* param.: (input) the data to be sent
+* return: (output) the Error state of the function 0 if an error happens and 1 otherwise
+*/
 I2C_ERR_STATE I2C_u8MasterSendData(uint8_t data){
 	uint8_t u8State = I2C_OK;
 	TWDR_REG = data;
@@ -57,7 +72,12 @@ I2C_ERR_STATE I2C_u8MasterSendData(uint8_t data){
 	}
 	return u8State;
 }
-
+/*
+* brief: This function is used to receive data from the SDA line to the Master
+* param.: (input) a pointer to a variable to hold the data that will be received
+* param.: (input) the type of acknowledgement to send to the SDA line after receiving the data either ACK or NACK
+* return: (output) the Error state of the function 0 if an error happens and 1 otherwise
+*/
 I2C_ERR_STATE I2C_u8MasterGetData(uint8_t* data, ACKNOWLEDGEMENT acknowledgement){
 	uint8_t u8State = I2C_OK;
 	switch(acknowledgement){
@@ -88,7 +108,11 @@ I2C_ERR_STATE I2C_u8MasterGetData(uint8_t* data, ACKNOWLEDGEMENT acknowledgement
 	return u8State;
 
 }
-
+/*
+* brief: This function is used to send data from the slave to the SDA line
+* param.: (input) the data to be sent
+* return: (output) the Error state of the function 0 if an error happens and 1 otherwise
+*/
 I2C_ERR_STATE I2C_u8SlaveSendData(uint8_t data){
 	uint8_t u8State = I2C_OK;
 	TWDR_REG = data;
@@ -99,7 +123,12 @@ I2C_ERR_STATE I2C_u8SlaveSendData(uint8_t data){
 	}
 	return u8State;
 }
-
+/*
+* brief: This function is used to receive data from the SDA line to the slave
+* param.: (input) a pointer to a variable to hold the data that will be received
+* param.: (input) the type of acknowledgement to send to the SDA line after receiving the data either ACK or NACK
+* return: (output) the Error state of the function 0 if an error happens and 1 otherwise
+*/
 I2C_ERR_STATE I2C_u8SlaveGetData(uint8_t* data, ACKNOWLEDGEMENT acknowledgement){
 	uint8_t u8State = I2C_OK;
 	switch(acknowledgement){
@@ -130,7 +159,11 @@ I2C_ERR_STATE I2C_u8SlaveGetData(uint8_t* data, ACKNOWLEDGEMENT acknowledgement)
 	return u8State;
 
 }
-
+/*
+* brief: This function is used to listen to the SDA line checking if Own slave address has be sent to the SDA line and receving the required action
+* param.: (input) a pointer to a variable to hold the action that will be received either WRITE or READ
+* return: (output) the Error state of the function 0 if an error happens and 1 otherwise
+*/
 I2C_ERR_STATE I2C_u8SlaveListen(ACTION* action){
 	
 	uint8_t u8State = I2C_OK;
@@ -148,7 +181,10 @@ I2C_ERR_STATE I2C_u8SlaveListen(ACTION* action){
 	
 	return u8State;
 }
-
+/*
+* brief: This function is used to set own slave address
+* param.: (input) the address that will be set
+*/
 void I2C_SetSlaveAddress(uint8_t address){
 	
 	TWAR_REG = (address << 1) & 0xFE;
